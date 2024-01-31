@@ -22,6 +22,10 @@ export const SampleFunctionDefinition = DefineFunction({
         type: Schema.slack.types.user_id,
         description: "The user invoking the workflow",
       },
+      spreadsheet_row: {
+        type: Schema.types.object,
+        description: "Selected Google Spreadsheet row",
+      },
     },
     required: ["message"],
   },

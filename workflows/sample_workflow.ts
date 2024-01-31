@@ -1,5 +1,6 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
 import { SampleFunctionDefinition } from "../functions/sample_function.ts";
+import { Connectors } from "deno-slack-hub/mod.ts";
 
 /**
  * A workflow is a set of steps that are executed in order.
@@ -57,6 +58,17 @@ const inputForm = SampleWorkflow.addStep(
   },
 );
 
+const sheetStep = SampleWorkflow.addStep(
+  Connectors.GoogleSheets.functions.SelectSpreadsheetRow,
+  {
+    spreadsheet_id: Deno.env.get("SPREADSHEET_ID")!,
+    sheet_title: Deno.env.get("SPREADSHEET_TITLE")!,
+    column_name: Deno.env.get("SPREADSHEET_COL")!,
+    cell_value: Deno.env.get("SPREADSHEET_CELL")!,
+    google_access_token: { credential_source: "DEVELOPER" },
+  },
+);
+
 /**
  * Custom functions are reusable building blocks
  * of automation deployed to Slack infrastructure. They
@@ -67,6 +79,7 @@ const inputForm = SampleWorkflow.addStep(
 const sampleFunctionStep = SampleWorkflow.addStep(SampleFunctionDefinition, {
   message: inputForm.outputs.fields.message,
   user: SampleWorkflow.inputs.user,
+  spreadsheet_row: sheetStep.outputs.column_values,
 });
 
 /**
